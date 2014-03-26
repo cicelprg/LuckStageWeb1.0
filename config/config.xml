@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+	<mysql>
+		<host>localhost</host>
+		<user>root</user>
+		<password>245030109</password>
+		<dbname>test</dbname>
+	</mysql>
+	<memcached>
+		<host>localhost</host>
+		<port>port</port>
+	</memcached>
+	
+	<control>
+		<view>index.php</view>
+		<view status="SYS_SUCCESS_200">success.php</view> <!-- 这里success可以直接转换成string -->
+		<view status="SYS_ERROR_404">404error.php</view>  <!-- 这里的status 相当于arrbite关联数组 value也是的 -->
+		
+		<command name="login">
+			<view>login.php</view>	
+			<status value="SYS_SUCCESS_200"><!-- 这里的value也是属性值 -->
+				<forward>userinfo</forward><!-- 这里登录成功转向命令-->
+			</status>
+		</command>
+		
+		<command name="userinfo" >
+			<view>userinfo.php</view><!-- status 默认状态视图 -->
+		</command>
+		
+	</control>
+</root>
