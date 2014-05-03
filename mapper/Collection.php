@@ -23,9 +23,7 @@ abstract class Collection implements \Iterator
 	 * row array
 	 * @var array
 	 */
-	protected $raw;
-	
-	private $result;
+	protected $raw = array();
 	
 	/**
 	 * raw pointer
@@ -139,10 +137,25 @@ abstract class Collection implements \Iterator
 	}
 	
 	/**
+	 * set mapper
+	 * @param \mapper\Mapper $mapper
+	 */
+	function setMapper(\mapper\Mapper $mapper){
+		$this->mapper = $mapper;
+	}
+	
+	/**
+	 * get Mapper
+	 * @return object
+	 */
+	function getMapper(){
+		return $this->mapper;
+	}
+	
+	/**
 	 * get the target class name
 	 */
 	protected abstract function targetClass();
-	
 }
 
 ?>

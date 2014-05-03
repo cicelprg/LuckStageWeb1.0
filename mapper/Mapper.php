@@ -64,6 +64,9 @@ abstract class Mapper
 	 * @param array $array
 	 */
 	protected abstract function doCreateDomainObject(array $array);
+	
+	protected abstract function getSelfCollection(array $arr);
+
 }
 
 ?>

@@ -2,6 +2,9 @@
 
 namespace mapper\mappers;
 
+require_once 'mapper/collections/UserCollerction.php';
+use mapper\collections\UserCollerction;
+
 require_once ('mapper/Mapper.php');
 
 use mapper\Mapper;
@@ -63,6 +66,10 @@ class UserMapper extends Mapper
 			return false;
 		}
 		return $row;
+	}
+	
+	protected function  getSelfCollection(array $arr){
+		return new UserCollerction($arr,$this);
 	}
 }
 
