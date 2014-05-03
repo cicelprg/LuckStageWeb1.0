@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <root>
 	<mysql>
+		<drive>mysql</drive>
 		<host>localhost</host>
 		<user>root</user>
 		<password>245030109</password>
@@ -12,19 +13,27 @@
 	</memcached>
 	
 	<control>
-		<view>index.php</view>
-		<view status="SYS_SUCCESS_200">success.php</view> <!-- 这里success可以直接转换成string -->
-		<view status="SYS_ERROR_404">404error.php</view>  <!-- 这里的status 相当于arrbite关联数组 value也是的 -->
+		<!-- Global views -->
+		<view>index.php</view> <!-- default -->
+		<view status="SYS_ERROR_404">error_404.php</view>
+		<!-- End Global views -->
 		
 		<command name="login">
-			<view>login.php</view>	
-			<status value="SYS_SUCCESS_200"><!-- 这里的value也是属性值 -->
-				<forward>userinfo</forward><!-- 这里登录成功转向命令-->
+			<path>/user/</path>
+			<view>/user/login.php</view>	
+			<status value="SYS_SUCCESS"><!-- 这里的value也是属性值 -->
+				<forward>showcontacts</forward><!-- 这里登录成功转向命令-->
 			</status>
 		</command>
 		
-		<command name="userinfo" >
-			<view>userinfo.php</view><!-- status 默认状态视图 -->
+		<command name="showcontacts">
+			<path>/user/</path> <!-- 表示命令类位于command/user/目录下 -->
+			<view >/user/contacts.php</view>
+		</command>
+
+		<command name="index">
+			<path>/</path><!-- 表示命令类位于command目录下 -->
+			<view>/index.php</view>
 		</command>
 		
 	</control>
