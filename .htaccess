@@ -1,6 +1,5 @@
 <IFModule rewrite_module>
 RewriteEngine On
 RewriteRule (views.*) $1
-
 RewriteRule ^.*$ index.php
 </IFModule>
