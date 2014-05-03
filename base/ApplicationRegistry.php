@@ -1,14 +1,9 @@
 <?php
-
 namespace base;
-
 require_once 'controller/appController.php';
 use controller\appController;
-
 require_once ('base/Registry.php');
-
 use base\Registry;
-
 /**
  * 应用程序注册表,这个类主要功能:获取程序配置数据 和缓存程序配置数据
  * (包括数据库配置，和appController中的命令配置)
@@ -21,40 +16,54 @@ class ApplicationRegistry extends Registry
 	private static $instance;
 	
 	/**
-	 * 数据缓存文件路劲
+	 * 配置文件文件路劲
 	 * @var string
 	 */
 	private $dir   = 'appData';
 	
+	/**
+	 * 配置信息
+	 * @var array
+	 */
 	private $values= array();
 	
+	/**
+	 * 上次修改时间
+	 * @var array
+	 */
 	private $mtimes= array(); 
 	
+	
+	/**
+	 * 防止被实例化
+	 */
 	private function __construct(){}
 	
-	static  function instance()
-	{
-		if(!isset(self::$instance))
-		{
+	/**
+	 * 获取单例对象
+	 * @return \base\ApplicationRegistry
+	 */
+	static  function instance(){
+		if(!isset(self::$instance)){
 			self::$instance = new self();
 		}
 		return self::$instance;
 	}
 	
+	/**
+	 * (non-PHPdoc)
+	 * @see \base\Registry::get()
+	 */
 	protected function get($key)
 	{
 		$path = $this->dir.DIRECTORY_SEPARATOR.$key;
-		if(file_exists($path))
-		{
+		if(file_exists($path)){
 			clearstatcache();
 			$mtime = filemtime($path);
-			if(!isset($this->mtimes[$key]))
-			{
+			if(!isset($this->mtimes[$key])){
 				$this->mtimes[$key] = 0;
 			}
-			
-			if($mtime>$this->mtimes[$key])
-			{
+			if($mtime>$this->mtimes[$key]){
 				$data = file_get_contents($path);
 				$this->mtimes[$key] = $mtime;
 				return ($this->values[$key]=unserialize($data));
@@ -64,8 +73,11 @@ class ApplicationRegistry extends Registry
 		return isset($this->values[$key])?$this->values[$key]:null;
 	}
 	
-	protected function set($key, $val)
-	{
+	/**
+	 * (non-PHPdoc)
+	 * @see \base\Registry::set()
+	 */
+	protected function set($key, $val){
 		$this->values[$key] = $val;
 		$this->mtimes[$key] = time();
 		$path = $this->dir.DIRECTORY_SEPARATOR.$key;
@@ -77,16 +89,12 @@ class ApplicationRegistry extends Registry
 	 * @param string $key
 	 * @param int $time
 	 */
-	static function checkCache($key,$time)
-	{
+	static function checkCache($key,$time){
 		$path = 'appData'.DIRECTORY_SEPARATOR.$key;
-		if(file_exists($path))
-		{
+		if(file_exists($path)){
 			$cahefiletime = filemtime($path);
-			if($time<$cahefiletime)
-			{
-				//缓存没有过期
-				return true;
+			if($time<$cahefiletime){
+				return true;//缓存没有过期
 			}
 		}
 		return false;
@@ -96,13 +104,15 @@ class ApplicationRegistry extends Registry
 	 * 设定 mysql 数据配置
 	 * @param controllerMysql $mysql
 	 */
-	static function setMysql($mysql)
-	{
+	static function setMysql($mysql){
 		self::instance()->set('mysql',$mysql);
 	}
 	
-	static function getMysql()
-	{
+	/**
+	 * 获取mysql配置信息
+	 * @return Ambigous <mixed, NULL>
+	 */
+	static function getMysql(){
 		return self::instance()->get('mysql');
 	}
 	
@@ -110,13 +120,15 @@ class ApplicationRegistry extends Registry
 	 * 设定 app cmd 数据配置
 	 * @param controllerMap $val
 	 */
-	static function setControllerMap($val)
-	{
+	static function setControllerMap($val){
 		self::instance()->set('controllerMap', $val);
 	}
 	
-	static function getControllerMap()
-	{
+	/**
+	 * 获取controllerMap
+	 * @return Ambigous <mixed, NULL>
+	 */
+	static function getControllerMap(){
 		return self::instance()->get('controllerMap');
 	}
 	
@@ -125,8 +137,7 @@ class ApplicationRegistry extends Registry
 	 * 获取appController
 	 * @return \controller\appController
 	 */
-	static function appController()
-	{
+	static function appController(){
 		return new appController(self::getControllerMap());
 	}
 }
