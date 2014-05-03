@@ -11,11 +11,7 @@ use command\Command;
  */
 class ErrorCommand extends Command 
 {
-	function doExcute(Request $request)
-	{
-		//设置跳转路径
-		$request->setProperty('location', 'views/404error.html');
+	function doExcute(Request $request){
 	}
 }
-
 ?>

@@ -2,54 +2,117 @@
 
 namespace controller;
 /**
- * 缓存mysql 配置信息
+ * mysql 配置信息类
  * @author prg
+ * @package controller
  */
 class controllerMysql 
 {
+	/**
+	 * host name
+	 * @var string
+	 */
 	private $hostName;
+	
+	/**
+	 * user name
+	 * @var string
+	 */
 	private $userName;
+	
+	/**
+	 * user password
+	 * @var string
+	 */
 	private $userPwd;
+	
+	/**
+	 * database name
+	 * @var string
+	 */
 	private $dbName;
 	
-	function setHost($host="localhost")
-	{
+	/**
+	 * database drive
+	 * @var string
+	 */
+	private $drive;
+	
+	/**
+	 * set host
+	 * @param string $host
+	 */
+	function setHost($host="localhost"){
 		$this->hostName = $host;
 	}
-	
-	function getHost()
-	{
+	/**
+	 * get host
+	 * @return string
+	 */
+	function getHost(){
 		return $this->hostName;
 	}
-	
-	function setUser($user='root')
-	{
+	/**
+	 * set user
+	 * @param string $user
+	 */
+	function setUser($user='root'){
 		$this->userName = $user;
 	}
 	
-	function getUser()
-	{
+	/**
+	 * get user name
+	 * @return string
+	 */
+	function getUser(){
 		return $this->userName;
 	}
 	
-	function setPassword($pwd='')
-	{
+	/**
+	 * set password
+	 * @param unknown_type $pwd
+	 */
+	function setPassword($pwd=''){
 		$this->userPwd = $pwd;
 	}
-	
-	function getPassword()
-	{
+	/**
+	 * get password
+	 * @return string
+	 */
+	function getPassword(){
 		return $this->userPwd;
 	}
 	
-	function setDB($dbname)
-	{
-		return $this->dbName = $dbname;
+	/**
+	 * set database name
+	 * @param string $dbname
+	 */
+	function setDB($dbname){
+		$this->dbName = $dbname;
 	}
 	
-	function getDB()
-	{
+	/**
+	 * get database name
+	 * @return string
+	 */
+	function getDB(){
 		return $this->dbName;
+	}
+	
+	/**
+	 * set database drive
+	 * @param string $drive
+	 */
+	function setDrive($drive = 'mysql'){
+		$this->drive = $drive;
+	}
+	
+	/**
+	 * get database drive
+	 * @return string
+	 */
+	function getDrive(){
+		return $this->drive;
 	}
 }
 

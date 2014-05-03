@@ -1,7 +1,8 @@
 <?php
-
 namespace command;
-use base\Request;
+use base\request\RequestException;
+use base\response\ResponseRegisty;
+use base\request\Request;
 require_once 'command/Command.php';
 use command\Command;
 
@@ -11,9 +12,11 @@ use command\Command;
  */
 class DefaultCommand extends Command
 {
-	function doExcute(Request $request)
-	{
-		return self::statuses($request->getProperty('status'));
+	function doExcute(Request $request){
+		if($request->getException()!= NULL||ResponseRegisty::getResponse()->getException() instanceof RequestException){
+			return self::statuses('SYS_ERROR_404');
+		}
+		return self::statuses();
 	}
 }
 

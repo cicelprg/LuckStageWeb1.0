@@ -1,14 +1,13 @@
 <?php
 namespace controller;
-
-require_once 'base/Request.php';
-use base\Request;
-
+require_once 'controller/ApplicationException.php';
+use controller\ApplicationException;
+use base\request\RequestException;
+use command\Command;
 require_once 'command/DefaultCommand.php';
 use command\DefaultCommand;
-
-require_once 'controller/controllerMap.php';
 use controller\controllerMap;
+use base\request\Request;
 
 /**
  * 应用控制器  FronController 将调用这个控制器来获取对应Command,将代替之前的CommandResolver
@@ -17,23 +16,39 @@ use controller\controllerMap;
  */
 class appController 
 {
-	private static $base_cmd;
-	private static $default_cmd;
+	/**
+	 * 基础命令
+	 * @var command\Command
+	 */
+	private static $baseCmd;
+	
+	/**
+	 * 默认命令
+	 * @var command\DefaultCommand
+	 */
+	private static $defaultCmd;
+	
+	/**
+	 * 命令控制器
+	 * @var controllerMap
+	 */
 	private $controllerMap;
 	
 	/**
 	 * 记录在单次http 请求中被请求的命令，防止死循环命令的发生
-	 * @var unknown_type
+	 * @var array
 	 */
 	private $invoked = array(); 
 	
-	function __construct(controllerMap $map)
-	{
+	/**
+	 * 初始化
+	 * @param controllerMap $map
+	 */
+	function __construct(controllerMap $map){
 		$this->controllerMap = $map;
-		if(!isset(self::$base_cmd)||is_null(self::$base_cmd))
-		{
-			self::$base_cmd    = new \ReflectionClass("command\\Command");
-			self::$default_cmd = new DefaultCommand(); 
+		if(!isset(self::$baseCmd)||is_null(self::$baseCmd)){
+			self::$baseCmd    = new \ReflectionClass("command\\Command");
+			self::$defaultCmd  = new DefaultCommand(); 
 		}
 	}
 	
@@ -42,24 +57,20 @@ class appController
 	 * @param Request $req
 	 * @return string
 	 */
-	function getView(Request $req)
-	{
+	function getView(Request $req){
 		$view = $this->getResource($req, 'View');
 		return $view;
 	}
-	
 	
 	/**
 	 * 获取跳转命令 
 	 * @param Request $req
 	 * @return string
 	 */
-	function getForward(Request $req)
-	{
-		$forward = $this->getResource($req, 'Forward');
-		if(!is_null($forward))
-		{
-			//这里设定跳转命令到Request中 
+	function getForward(Request $req){
+		$forward = $this->getResource($req, 'Forward');		
+		if(!is_null($forward)){
+			$req->setCurCmdStr($forward);
 		}
 		return $forward;
 	}
@@ -69,42 +80,14 @@ class appController
 	 * @param Request $request
 	 * @param string $res(View,Forward,Classroot)
 	 */
-	function getResource(Request $req,$res)
-	{
-		//取得当前执行的命令
-		$cmd    = @$req->getProperty('syscmd');
-		
-		//获取前一个命令对象，和执行状态
-		$prveCmd    = $req->getLastCommand();
+	function getResource(Request $req,$res){
+		$prveCmd    = $req->getLastCommand();//获取前一个命令对象
 		$prveStatus = $prveCmd->getStatus();
+		$ref = new \ReflectionClass(get_class($prveCmd));
+		$cmd = $ref->getShortName();
+		$cmd = strtolower(str_replace('Command', '', $cmd));
 		$acquire    = "get$res";
-		
-		//
-		$resource   = $this->controllerMap->$acquire($cmd,$prveStatus); 
-		
-		
-		//如果没有获取到对应命令且该状态下的对应资源
-		
-		
-		///这里资源查找 还有待考虑
-		//查找该命令下的默认状态资源
-		if(is_null($resource))
-		{
-			$resource = $this->controllerMap->$acquire($cmd,0);
-		}
-		
-		//这个状态下的默认资源
-		if(!$resource)
-		{
-			$resource = $this->controllerMap->$acquire('default',$prveStatus);
-		}
-		
-		//默认状态下的默认命令的资源 
-		if(!$resource)
-		{
-			$resource = $this->controllerMap->$acquire('default',0);
-		}
-		
+		$resource   = $this->controllerMap->$acquire($cmd,$prveStatus);//查找对应的资源
 		return $resource;
 	}
 	
@@ -113,58 +96,31 @@ class appController
 	 * @param Request $req
 	 * @return \command\DefaultCommand|NULL|OtherCommand
 	 */
-	function getCommand(Request $req)
-	{
-		// lastCommand 在Request 中初始化为 null
+	function getCommand(Request $req){
 		$prevCmd = $req->getLastCommand();
-		if(!$prevCmd)
-		{
-			//这是本次请求调用的第一个命令 
-			$cmd = @$req->getProperty('syscmd');
-			
-			if(!$cmd)
-			{
-				//没有请求命令，使用默认命令并且返回默认状态 ,每个命令的默认状态时0,这里就是现实主页
-				$req->setProperty('syscmd', 'default');
-				return self::$default_cmd;
+		if(is_null($prevCmd)){
+			$cmd = $req->getCurCmdStr(); //first request
+			if($cmd==''||$cmd=='default'){
+				$req->setCurCmdStr();
+				return self::$defaultCmd;
 			}
 		}
-		else 
-		{
-			//之前已经执行过命令 要进行forward命令执行
-			$cmd = $this->getForward($req);
-			
-			if(!$cmd)
-			{
-				//没有获取下一个命令
+		else {
+			$cmd = $this->getForward($req);//get forward command
+			if(!$cmd){
 				return null;
 			}
 		}
-		
-		//解析这个cmd(可能是第一次请求命令,也可能是forward命令)命令名称 生成对应的OBJ
-		$cmdObj = $this->resolveCommand($cmd);
-		
-		
-		if(!$cmdObj)
-		{
-			//用户url 不正确提示404错误
-			$req->setProperty('syscmd','default');
-			
-			//这里在Request里设定了一个status,在
-			$req->setProperty('status', 'SYS_ERROR_404');
-			
-			return  self::$default_cmd;
+		$cmdObj = $this->resolveCommand($cmd); //实例化命令
+		if(!$cmdObj){
+			\base\response\ResponseRegisty::getResponse()->setException(new RequestException("Sorry! We Can't Find The Page! Please Try Again"));//404 error
+			return self::$defaultCmd;
 		}
-		
 		$cmd_class = get_class($cmdObj);
-		if(isset($this->invoked[$cmd_class]))
-		{
-			//在本次请求的时候这个命令已经执行过了  这是一个死循环命令,抛出系统级别错误
-			echo $cmd,'是一个死循环命令';
-			exit;
+		if(isset($this->invoked[$cmd_class])){//在本次请求的时候这个命令已经执行过了 这是一个死循环命令,抛出系统级别错误
+			throw new ApplicationException('Sorry!系统错误,我们会尽快修复!');
 		}
 		$this->invoked[$cmd_class] = 1;
-		
 		return $cmdObj;
 	}
 	
@@ -173,25 +129,18 @@ class appController
 	 * @param string $cmd
 	 * @return \ReflectionClass|boolean
 	 */
-	private function resolveCommand($cmd)
-	{
-		//获取是否有映射命令
-		$classroot = $this->controllerMap->getClassroot($cmd);
-		
+	private function resolveCommand($cmd){
+		$classroot = $this->controllerMap->getClassroot($cmd);//获取是否有映射命令
+		$path      = $this->controllerMap->getPath($cmd);
 		$classroot = ucfirst($classroot);
-		
-		$filepath  = 'command\\'.$classroot.'Command.php';
-		
-		$className = "command\\$classroot".'Command';
-		
-		if(file_exists($filepath))
-		{
+		$filepath  = 'command'.$path.$classroot.'Command.php';
+		$className = 'command'.$path.$classroot.'Command';
+		$className = str_replace('/', '\\', $className);
+		if(file_exists($filepath)){
 			require_once "$filepath";
-			if(class_exists($className))
-			{
+			if(class_exists($className)){
 				$cmdObj = new \ReflectionClass($className);
-				if($cmdObj->isSubclassOf(self::$base_cmd))
-				{
+				if($cmdObj->isSubclassOf(self::$baseCmd)){
 					return $cmdObj->newInstance();
 				}
 			}
@@ -199,5 +148,4 @@ class appController
 		return false;
 	}
 }
-
 ?>
