@@ -13,22 +13,24 @@
 	</memcached>
 	
 	<control>
-		<!-- Global views -->
-		<view>index.php</view> <!-- default -->
-		<view status="SYS_ERROR_404">error_404.php</view>
-		<!-- End Global views -->
 		
+		<command name="default">
+			<path>/</path>
+			<view>/index.php</view> <!-- default -->
+			<view status="SYS_ERROR_404">/error_404.php</view>
+		</command>
+
 		<command name="login">
 			<path>/user/</path>
 			<view>/user/login.php</view>	
-			<status value="SYS_SUCCESS"><!-- 这里的value也是属性值 -->
+			<status value="SYS_SUCCESS">
 				<forward>showcontacts</forward><!-- 这里登录成功转向命令-->
 			</status>
 		</command>
 		
 		<command name="showcontacts">
-			<path>/user/</path> <!-- 表示命令类位于command/user/目录下 -->
-			<view >/user/contacts.php</view>
+			<path>/user/</path> <!-- 命令类位于command/user/目录下 -->
+			<view >/user/contacts.php</view><!-- 视图路径配置 -->
 		</command>
 
 		<command name="index">
