@@ -17,7 +17,7 @@ class UserMapper extends Mapper
 	private static $findById      = "select user_id,uname from user where user_id = ?";
 	private static $updateById    = "update users set uname = ? ,upwd=? where user_id = ?";
 	private static $insert        = "insert into users(uname,upwd) values(?,?)";
-	
+	private static $findIdByName  = "select user_id from users where uname=?";
 	function __construct(){
 		parent::__construct();
 	}
@@ -29,10 +29,12 @@ class UserMapper extends Mapper
 	 */
 	protected function doInsert(\domain\DomainObject $domain){
 		$insertStmt = self::$pdo->prepare(self::$insert);
-		$values     = array($domain->getUserName(),$domain->getPassword);
+		$values     = array($domain->getUserName(),$domain->getPassword());
 		try{
 			if(!$insertStmt->execute($values)){
 				throw new \Exception('insert user error!');		
+			}else{
+				$domain->setID(self::$pdo->lastInsertId());
 			}
 		}catch (\Exception $e){
 			echo $e->getMessage();
@@ -46,7 +48,7 @@ class UserMapper extends Mapper
 	  * @return \domain\domains\User
 	  */
 	protected function doCreateDomainObject(array $array){
-		$object = new \domain\domains\User($array['user_id'],$array['uname'],$array['upwd']);
+		$object = new \domain\domains\User(@$array['user_id'],@$array['uname'],@$array['upwd']);
 		return $object;
 	}
 	
@@ -68,6 +70,26 @@ class UserMapper extends Mapper
 		return $row;
 	}
 	
+	/**
+	 * 通过用户名查找id
+	 * @param string $name
+	 * @return mixed|NULL
+	 */
+	function findIdByName($name){
+		$stmt = self::$pdo->prepare(self::$findIdByName);
+		$stmt->bindParam(1, $name);
+		$stmt->execute();
+		$row = $stmt->fetch(\PDO::FETCH_ASSOC);
+		if(isset($row)&&!empty($row)){
+			return $row['user_id'];
+		}
+		return null;
+	}
+	
+	/**
+	 * (non-PHPdoc)
+	 * @see \mapper\Mapper::getSelfCollection()
+	 */
 	protected function  getSelfCollection(array $arr){
 		return new UserCollerction($arr,$this);
 	}
