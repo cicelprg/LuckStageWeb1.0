@@ -68,7 +68,7 @@ class ApplicationHelper
 		}else{
 			$this->getMysqlOptions();
 		}
-		if(ApplicationRegistry::checkCache('controllerMap', $xmlfiletime)){
+		if(ApplicationRegistry::checkCache('controllerMap', $xmlfiletime)&&false){
 			$controlllerMap = ApplicationRegistry::getControllerMap();
 		}else{
 			$this->getContollerOptions();
@@ -104,17 +104,6 @@ class ApplicationHelper
 			$this->xmlObj = simplexml_load_file($this->config);
 		}
 		$map = new controllerMap();
-		//GLOBAL Views
-		foreach ($this->xmlObj->control->view as $global_view){
-			$status_str=(string)$global_view['status'];
-			if($status_str!=''){
-				$status = Command::statusInt($status_str);//转换为状态数字
-			}
-			else{
-				$status = 0;//default
-			}
-			$map->addView('default',$status,(string)$global_view);//全局视图对应的命令为 default
-		}
 		//对命令的解析
 		$status =0;
 		foreach ($this->xmlObj->control->command as $command){
