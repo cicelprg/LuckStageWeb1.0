@@ -5,11 +5,14 @@
 <title>Insert title here</title>
 </head>
 <body>
-<form action="/Logining" method="get">
+<?php
+	echo \base\response\ResponseRegisty::getResponse()->getFeedbackStr(); 
+?>
+<form action="/regist" method="post">
 	Name:<input type="text" name="user" /><br/>
 	Pw d:<input type="text" name="password" /> <br />
-	RPwd:<input type="text" name="password" /> <br />
-	<input type="submit" value="sub" />
+	RPwd:<input type="text" name="repassword" /> <br />
+	<input type="submit" value="sub" /> <input type="reset" value="rest">
 </form>
 </body>
 </html>
