@@ -28,14 +28,31 @@
 			</status>
 		</command>
 		
+		<command name="regist">
+			<path>/user/</path>
+			<view>/user/regist.php</view>
+			<status value="SYS_SUCCESS">
+				<forward>showcontacts</forward>
+			</status>
+		</command>
+		
 		<command name="showcontacts">
 			<path>/user/</path> <!-- 命令类位于command/user/目录下 -->
-			<view >/user/contacts.php</view><!-- 视图路径配置 -->
+			<view>/user/contacts.php</view><!-- views/user/contacts.php 视图路径配置 -->
+			<view status="SYS_ERROR_600">/index.php</view>
 		</command>
 
 		<command name="index">
 			<path>/</path><!-- 表示命令类位于command目录下 -->
 			<view>/index.php</view>
+		</command>
+		
+		<command name="addcontact">
+			<path>/contact/</path>
+			<view>/user/addcontact.php</view>
+			<status value="SYS_SUCCESS">
+				<forward>showcontacts</forward>
+			</status>
 		</command>
 		
 	</control>
