@@ -37,6 +37,7 @@ class RequestHelper
 	 * @param Request $req
 	 */
 	public function init(Request $req){
+		$req->setHost($_SERVER['SERVER_NAME']);
 		$request_uri = $_SERVER['REQUEST_URI'];
 		$req->setRequestUri($request_uri);
 		if(strlen($request_uri)<=1){ //home page
