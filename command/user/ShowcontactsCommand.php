@@ -9,6 +9,9 @@ require_once ('command/Command.php');
 require_once 'mapper/mappers/AddressBookMapper.php';
 use \mapper\mappers\AddressBookMapper;
 
+require_once 'mapper/mappers/UserMapper.php';
+use \mapper\mappers\UserMapper;
+
 use command\Command;
 use base\request\Request;
 
@@ -21,7 +24,7 @@ class ShowcontactsCommand extends Command
 {
 	function doExcute(Request $request){
 		$user    = SessionRegistry::getUser();
-		if(!is_object($user)){
+		if(!isset($user)||$user==''){
 			return self::statuses('SYS_ERROR_600');
 		}
 		$mapper  = Helpfactory::getMapper("\\mapper\\mappers\\AddressBookMapper");

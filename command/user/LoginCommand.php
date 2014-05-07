@@ -17,7 +17,6 @@ use base\request\Request;
 
 class LoginCommand extends Command
 {
-	
 	/**
 	 * (non-PHPdoc)
 	 * @see \command\Command::doExcute()
