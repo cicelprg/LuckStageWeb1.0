@@ -63,6 +63,12 @@ class Request
 	private $exception;
 	
 	/**
+	 * Requst Host
+	 * @var string
+	 */
+	private $host;
+	
+	/**
 	 * 初始化url
 	 * @param string $request_uri
 	 */
@@ -186,6 +192,22 @@ class Request
 	 */
 	function getException(){
 		return $this->exception;
+	}
+	/**
+	 * 设定主机名
+	 * @param string $host
+	 * @return \base\request\Request
+	 */
+	function setHost($host="localhost"){
+		$this->host = $host;
+		return $this;
+	}
+	/**
+	 * 获取主机名
+	 * @return string
+	 */
+	function getHost(){
+		return $this->host;
 	}
 	
 	function setCookie(){}
