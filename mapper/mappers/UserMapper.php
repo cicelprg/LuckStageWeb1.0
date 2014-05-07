@@ -93,6 +93,10 @@ class UserMapper extends Mapper
 	protected function  getSelfCollection(array $arr){
 		return new UserCollerction($arr,$this);
 	}
+	
+	protected function doDelete(\domain\DomainObject $domain){
+		
+	}
 }
 
 ?>
