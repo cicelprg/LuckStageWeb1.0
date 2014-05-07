@@ -13,13 +13,12 @@
 	</memcached>
 	
 	<control>
-		
 		<command name="default">
 			<path>/</path>
 			<view>/index.php</view> <!-- default -->
 			<view status="SYS_ERROR_404">/error_404.php</view>
 		</command>
-
+		
 		<command name="login">
 			<path>/user/</path>
 			<view>/user/login.php</view>	
@@ -39,9 +38,11 @@
 		<command name="showcontacts">
 			<path>/user/</path> <!-- 命令类位于command/user/目录下 -->
 			<view>/user/contacts.php</view><!-- views/user/contacts.php 视图路径配置 -->
-			<view status="SYS_ERROR_600">/index.php</view>
+			<status value="SYS_ERROR_600">
+				<forward>login</forward>
+			</status>
 		</command>
-
+		
 		<command name="index">
 			<path>/</path><!-- 表示命令类位于command目录下 -->
 			<view>/index.php</view>
@@ -53,7 +54,36 @@
 			<status value="SYS_SUCCESS">
 				<forward>showcontacts</forward>
 			</status>
+			<status value="SYS_ERROR_600">
+				<forward>login</forward>
+			</status>
 		</command>
 		
+		<command name="delete">
+			<path>/contact/</path>
+			<view>/user/delete.php</view>
+			<status value="SYS_SUCCESS">
+				<forward>showcontacts</forward>
+			</status>
+			<status value="SYS_ERROR_600">
+				<forward>login</forward>
+			</status>
+		</command>
+		
+		<command name="modify">
+			<path>/contact/</path>
+			<view>/user/modify.php</view>
+			<status value="SYS_SUCCESS">
+				<forward>showcontacts</forward>
+			</status>
+			<status value="SYS_ERROR_600">
+				<forward>login</forward>
+			</status>
+		</command>
+		
+		<command name="lngout">
+			<path>/user/</path>
+			<view>/index.php</view>
+		</command>
 	</control>
 </root>
