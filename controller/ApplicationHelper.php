@@ -126,10 +126,10 @@ class ApplicationHelper
 			}
 			//解析forward 跳转命令根据命令不同的状态可能有多个跳转命令
 			$forwardStatus = $command->status;
-			foreach ($forwardStatus as $forwardSta){
-				
+			for ($i=0;$i<$forwardStatus->count();$i++){//这里用foreach 不行 why ？？
+				$forwardSta = $forwardStatus[$i];
 				$status_str = (string)$forwardSta['value'];
-				$forwardCmd = (string)$forwardStatus->forward;
+				$forwardCmd = (string)$forwardSta->forward;
 				$status     = Command::statusInt($status_str);
 				$map->addForward((string)$command['name'],$status,$forwardCmd);
 			}
