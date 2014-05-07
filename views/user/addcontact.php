@@ -2,11 +2,14 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Insert title here</title>
+<title>Add Contact</title>
 </head>
 <body>
+<?php
+echo \base\response\ResponseRegisty::getResponse()->getFeedbackStr();
+?>
 <form action="/addcontact" method="post">
-	Tel :<input type="text" name="repassword" />
+	Tel :<input type="text" name="tel" />
 	<input type="submit" value="sub" />
 </form>
 </body>
